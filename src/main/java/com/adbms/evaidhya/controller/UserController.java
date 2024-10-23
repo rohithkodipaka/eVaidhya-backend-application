@@ -1,9 +1,11 @@
 package com.adbms.evaidhya.controller;
 
+import com.adbms.evaidhya.enumerations.ROLE;
 import com.adbms.evaidhya.repository.UserRepository;
 import com.adbms.evaidhya.requestDTO.AuthRequest;
 import com.adbms.evaidhya.requestDTO.signUpRequestDTO;
 import com.adbms.evaidhya.responseDTO.userResponseDTO;
+import com.adbms.evaidhya.service.PatientService;
 import com.adbms.evaidhya.service.UserService;
 import com.adbms.evaidhya.service.jwt.UserDetailsImpl;
 import com.adbms.evaidhya.util.JwtUtil;
@@ -39,6 +41,9 @@ public class UserController {
     private UserRepository userRepository;
 
     @Autowired
+    private PatientService patientService;
+
+    @Autowired
     private AuthenticationManager authenticationManager;
 
     @Autowired
@@ -65,7 +70,7 @@ public class UserController {
     }
 
     @PostMapping("/authenticate")
-    public void createAuthenticationToken(@RequestBody AuthRequest authRequest, HttpServletResponse response) throws IOException, JSONException {
+    public void createAuthenticationToken(@RequestBody AuthRequest authRequest, HttpServletResponse response) throws Exception {
             try{
                 authenticationManager.authenticate(new
                         UsernamePasswordAuthenticationToken(authRequest.getUsername(),authRequest.getPassword()));
@@ -84,12 +89,23 @@ public class UserController {
                 response.getWriter().write("{\"error\":\"User not found\"}");
                 return;
             }
+            if(user.getUserRole()== ROLE.PATIENT){
+                Long patientId = patientService.getPatientId(user.getId());
+                response.getWriter().write(new JSONObject()
+                        .put("userId",user.getId())
+                        .put("role",user.getUserRole())
+                        .put("patientId",patientId)
+                        .toString()
+                );
+            }
 
-            response.getWriter().write(new JSONObject()
-                            .put("userId",user.getId())
-                            .put("role",user.getUserRole())
-                            .toString()
-            );
+            if(user.getUserRole()== ROLE.DOCTOR) {
+                response.getWriter().write(new JSONObject()
+                        .put("userId", user.getId())
+                        .put("role", user.getUserRole())
+                        .toString()
+                );
+            }
 
             response.setContentType("application/json");
             response.addHeader("Access-Control-Expose-Headers", "Authorization");
