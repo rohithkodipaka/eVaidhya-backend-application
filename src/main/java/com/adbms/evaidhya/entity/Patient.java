@@ -1,37 +1,38 @@
 package com.adbms.evaidhya.entity;
 
 
-import com.adbms.evaidhya.enumerations.ROLE;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.sound.midi.Sequence;
-
 @Entity
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Table(name = "users")
-public class User {
+@Table(name = "patient")
+public class Patient {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String email;
-
-    private String password;
-
     private String firstName;
 
     private String lastName;
 
-    private ROLE userRole;
+    private String phoneNo;
 
-    @OneToOne(mappedBy = "user")
-    private Patient patient;
+    private String email;
+
+    @OneToOne(cascade = CascadeType.ALL, mappedBy="patient")
+    private Address address;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
+    private String gender;
 }

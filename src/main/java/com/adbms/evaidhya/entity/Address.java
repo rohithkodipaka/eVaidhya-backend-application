@@ -1,37 +1,34 @@
 package com.adbms.evaidhya.entity;
 
 
-import com.adbms.evaidhya.enumerations.ROLE;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.sound.midi.Sequence;
-
 @Entity
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Table(name = "users")
-public class User {
+@Table(name = "address")
+public class Address {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String email;
+    private String aptNumber;
 
-    private String password;
+    private String street;
 
-    private String firstName;
+    private String city;
 
-    private String lastName;
+    private String state;
 
-    private ROLE userRole;
+    private String zipcode;
 
-    @OneToOne(mappedBy = "user")
+    @OneToOne
     private Patient patient;
 }
