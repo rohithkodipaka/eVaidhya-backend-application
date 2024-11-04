@@ -10,4 +10,6 @@ public interface UserService {
     Boolean emailExists(String email);
 
     userResponseDTO signUpDoctor(signUpRequestDTO request);
+
+    userResponseDTO signUpAdmin(signUpRequestDTO request);
 }

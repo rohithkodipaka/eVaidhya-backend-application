@@ -49,4 +49,9 @@ public class UserServiceImpl implements UserService{
         user.setUserRole(ROLE.DOCTOR);
         return userMapper.fromUser(userRepository.save(user));
     }
+    public userResponseDTO signUpAdmin(signUpRequestDTO request){
+        User user = userMapper.toUser(request);
+        user.setUserRole(ROLE.ADMIN);
+        return userMapper.fromUser(userRepository.save(user));
+    }
 }
