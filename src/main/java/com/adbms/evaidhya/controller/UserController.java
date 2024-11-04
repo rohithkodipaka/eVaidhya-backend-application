@@ -69,6 +69,14 @@ public class UserController {
         return new ResponseEntity<>(userResponse,HttpStatus.CREATED);
     }
 
+    @PostMapping("/admin/signup")
+    public ResponseEntity<?> signUpAdmin(@RequestBody signUpRequestDTO request){
+        if(userService.emailExists(request.getEmail()))
+            return new ResponseEntity<>("Admin already exists with the email!", HttpStatus.NOT_ACCEPTABLE);
+        userResponseDTO userResponse = userService.signUpAdmin(request);
+        return new ResponseEntity<>(userResponse,HttpStatus.CREATED);
+    }
+
     @PostMapping("/authenticate")
     public void createAuthenticationToken(@RequestBody AuthRequest authRequest, HttpServletResponse response) throws Exception {
             try{
@@ -106,6 +114,14 @@ public class UserController {
                         .toString()
                 );
             }
+
+        if(user.getUserRole()== ROLE.ADMIN) {
+            response.getWriter().write(new JSONObject()
+                    .put("userId", user.getId())
+                    .put("role", user.getUserRole())
+                    .toString()
+            );
+        }
 
             response.setContentType("application/json");
             response.addHeader("Access-Control-Expose-Headers", "Authorization");

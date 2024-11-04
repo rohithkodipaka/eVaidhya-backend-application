@@ -10,6 +10,8 @@ import com.adbms.evaidhya.responseDTO.PatientResponseDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -65,5 +67,27 @@ public class PatientServiceImpl implements PatientService{
         Patient savedPatient = patientRepository.save(patient);
         return patientMapper.fromPatient(savedPatient);
 
+    }
+
+    public List<PatientResponseDTO> getAllPatients(){
+        List<Patient> patients = patientRepository.findAll();
+        List<PatientResponseDTO> patientResponse = new ArrayList<>();
+        for(Patient patient:patients){
+            patientResponse.add(patientMapper.fromPatient(patient));
+        }
+        return patientResponse;
+    }
+
+    public void deletePatient(Long patientId) throws Exception {
+        Patient patient = findPatientById(patientId);
+        patientRepository.delete(patient);
+    }
+
+    public Patient findPatientById(Long patientId) throws Exception{
+        Optional<Patient> patient = patientRepository.findById(patientId);
+        if(patient.isEmpty()){
+            throw new Exception("Patient not found");
+        }
+        return patient.get();
     }
 }
