@@ -31,7 +31,4 @@ public class User {
     private String lastName;
 
     private ROLE userRole;
-
-    @OneToOne(mappedBy = "user")
-    private Patient patient;
 }
