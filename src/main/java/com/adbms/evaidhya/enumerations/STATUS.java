@@ -4,5 +4,7 @@ public enum STATUS {
 
     SCHEDULED,
 
-    COMPLETED
+    COMPLETED,
+
+    NO_SHOW
 }
