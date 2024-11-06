@@ -24,6 +24,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static com.adbms.evaidhya.enumerations.STATUS.*;
+import static com.adbms.evaidhya.enumerations.STATUS.NO_SHOW;
+
 @Service
 public class AppointmentServiceImpl implements AppointmentService{
 
@@ -86,16 +89,12 @@ public class AppointmentServiceImpl implements AppointmentService{
         if(patient.isPresent()){
             pat = patient.get();
         }
-        System.out.println("Saving appointment with Doctor ID: " + doc.getId() +
-                ", Patient ID: " + pat.getId() +
-                ", Date: " + request.getDate() +
-                ", Time: " + request.getTime());
         Appointment appointment = Appointment.builder()
                 .doctor(doc)
                 .patient(pat)
                 .appointmentDate(appointmentDate)
                 .appointmentTime(appointmentTime)
-                .status(STATUS.SCHEDULED)
+                .status(SCHEDULED)
                 .reasonForAppointment(request.getReasonForAppointment())
                 .build();
         Appointment savedAppointment = appointmentRepository.save(appointment);
@@ -106,5 +105,31 @@ public class AppointmentServiceImpl implements AppointmentService{
         Appointment appointment = appointmentRepository.findById(appointmentId)
                 .orElseThrow(()->new RuntimeException("Appointment not found"));
         appointmentRepository.delete(appointment);
+    }
+
+    public List<Appointment> viewAllPatientAppointments(Long patientId){
+        List<Appointment> response = appointmentRepository.findByPatientId(patientId);
+        return response;
+    }
+
+    public List<Appointment> viewAllDoctorAppointments(Long doctorId){
+        List<Appointment> response = appointmentRepository.findByDoctorId(doctorId);
+        return response;
+    }
+
+    public List<Appointment> getAllAppointments(){
+        List<Appointment> response = appointmentRepository.findAll();
+        return response;
+    }
+
+    public Appointment updateAppointmentStatus(Long appointmentId, int statusCode) throws Exception{
+        Appointment appointment = appointmentRepository.findById(appointmentId)
+                .orElseThrow(()->new RuntimeException("Appointment not found for given appointmentId"));
+        if ((statusCode == 0)) {
+            appointment.setStatus(COMPLETED);
+        } else {
+            appointment.setStatus(NO_SHOW);
+        }
+        return appointmentRepository.save(appointment);
     }
 }

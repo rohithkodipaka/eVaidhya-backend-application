@@ -4,6 +4,7 @@ package com.adbms.evaidhya.controller;
 import com.adbms.evaidhya.entity.Appointment;
 import com.adbms.evaidhya.entity.DoctorAvailability;
 import com.adbms.evaidhya.requestDTO.AppointmentRequest;
+import com.adbms.evaidhya.responseDTO.AppointmentResponseDTO;
 import com.adbms.evaidhya.responseDTO.DoctorTimeSlotResponse;
 import com.adbms.evaidhya.responseDTO.MessageRes;
 import com.adbms.evaidhya.service.AppointmentService;
@@ -43,4 +44,30 @@ public class AppointmentController {
         appointmentService.cancelAppointment(appointmentId);
         return new ResponseEntity<>("Appointment cancelled",HttpStatus.OK);
     }
+
+    @GetMapping("/view/patient/{patientId}")
+    public ResponseEntity<?> viewAllPatientAppointments(@PathVariable("patientId") Long patientId) throws Exception{
+        List<Appointment> response = appointmentService.viewAllPatientAppointments(patientId);
+        return new ResponseEntity<>(response,HttpStatus.OK);
+    }
+
+    @GetMapping("/view/doctor/{doctorId}")
+    public ResponseEntity<?> viewAllDoctorAppointments(@PathVariable("doctorId") Long doctorId) throws Exception{
+        List<Appointment> response = appointmentService.viewAllDoctorAppointments(doctorId);
+        return new ResponseEntity<>(response,HttpStatus.OK);
+    }
+
+    @GetMapping("/view")
+    public ResponseEntity<?> viewAllAppointments(){
+        List<Appointment> response = appointmentService.getAllAppointments();
+        return new ResponseEntity<>(response,HttpStatus.OK);
+    }
+
+    @PutMapping("/updateAppointmentStatus/{appointmentId}")
+    public ResponseEntity<?> updateAppointmentStatus(@PathVariable("appointmentId") Long appointmentId,
+                                                     @RequestParam("status") int statusCode) throws Exception {
+        Appointment response = appointmentService.updateAppointmentStatus(appointmentId, statusCode);   //status_code=0 -> completed ; status_code = 1 -> no_show
+        return new ResponseEntity<>(response,HttpStatus.OK);
+    }
+
 }
