@@ -1,16 +1,17 @@
 package com.adbms.evaidhya.service;
 
 import com.adbms.evaidhya.entity.Patient;
+import com.adbms.evaidhya.entity.PatientMedicalChart;
 import com.adbms.evaidhya.entity.User;
 import com.adbms.evaidhya.enumerations.ROLE;
 import com.adbms.evaidhya.mapper.UserMapper;
+import com.adbms.evaidhya.repository.PatientMedicalChartRepository;
 import com.adbms.evaidhya.repository.PatientRepository;
 import com.adbms.evaidhya.repository.UserRepository;
 import com.adbms.evaidhya.requestDTO.signUpRequestDTO;
 import com.adbms.evaidhya.responseDTO.userResponseDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.adbms.evaidhya.responseDTO.userResponseDTO;
 
 @Service
 public class UserServiceImpl implements UserService{
@@ -24,6 +25,9 @@ public class UserServiceImpl implements UserService{
     @Autowired
     private UserMapper userMapper;
 
+    @Autowired
+    private PatientMedicalChartRepository patientMedicalChartRepository;
+
     public userResponseDTO signUpPatient(signUpRequestDTO request){
          User user = userMapper.toUser(request);
          user.setUserRole(ROLE.PATIENT);
@@ -35,7 +39,12 @@ public class UserServiceImpl implements UserService{
                  .lastName(request.getLastName())
                  .user(savedUser)
                  .build();
-         patientRepository.save(patient);
+         Patient savedPatient = patientRepository.save(patient);
+
+        PatientMedicalChart patientMedicalChart = PatientMedicalChart.builder().
+                    patient(savedPatient)
+                    .build();
+        patientMedicalChartRepository.save(patientMedicalChart);
          return userMapper.fromUser(savedUser);
 
     }
