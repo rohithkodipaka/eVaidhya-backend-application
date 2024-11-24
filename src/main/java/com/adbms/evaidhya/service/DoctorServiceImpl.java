@@ -12,6 +12,7 @@ import com.adbms.evaidhya.repository.UserRepository;
 import com.adbms.evaidhya.requestDTO.DoctorRequestDTO;
 import com.adbms.evaidhya.responseDTO.DoctorProfileResponseDTO;
 import com.adbms.evaidhya.responseDTO.DoctorResponseDTO;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -43,6 +44,7 @@ public class DoctorServiceImpl implements DoctorService {
     @Autowired
     private DoctorAvailabilityRepository availabilityRepository;
 
+    @Transactional
     public DoctorResponseDTO addDoctor(DoctorRequestDTO request) {
         User user = User.builder()
                 .firstName(request.getFirstName())
@@ -53,30 +55,39 @@ public class DoctorServiceImpl implements DoctorService {
         String password = createDefaultPassword(request.getFirstName(), request.getLastName());
         user.setPassword(passwordEncoder.encode(password));
         User savedUser = userRepository.save(user);
-        DoctorResponseDTO doctorResponseDTO = new DoctorResponseDTO();
+
         Doctor doctor = doctorMapper.toDoctor(request);
         doctor.setUser(savedUser);
+
+        List<DoctorAvailability> doctorAvailabilities = createDefaultDoctorAvailability(doctor);
+        doctor.setAvailabilities(doctorAvailabilities);
+
         Doctor savedDoctor = doctorRepository.save(doctor);
-        createDefaultDoctorAvailability(savedDoctor);
+
         DoctorResponseDTO response = doctorMapper.fromDoctor(savedDoctor);
         response.setPassword(password);
         return response;
     }
 
-    private void createDefaultDoctorAvailability(Doctor savedDoctor) {
 
-        DayOfWeek[] weekdays={DayOfWeek.MONDAY,DayOfWeek.TUESDAY,DayOfWeek.WEDNESDAY,
-                DayOfWeek.THURSDAY,DayOfWeek.FRIDAY};
-        for(DayOfWeek day: weekdays){
+    private List<DoctorAvailability> createDefaultDoctorAvailability(Doctor doctor) {
+        List<DoctorAvailability> doctorAvailabilities = new ArrayList<>();
+        DayOfWeek[] weekdays = {DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY,
+                DayOfWeek.THURSDAY, DayOfWeek.FRIDAY};
+
+        for (DayOfWeek day : weekdays) {
             DoctorAvailability availability = DoctorAvailability.builder()
-                    .doctor(savedDoctor)
+                    .doctor(doctor) // Set doctor reference
                     .dayOfWeek(day)
-                    .startTime(LocalTime.of(9,0))
-                    .endTime(LocalTime.of(17,0))
+                    .startTime(LocalTime.of(9, 0))
+                    .endTime(LocalTime.of(17, 0))
                     .build();
-            availabilityRepository.save(availability);
+            doctorAvailabilities.add(availability);
         }
+
+        return doctorAvailabilities;
     }
+
 
     public String createDefaultPassword(String firstName, String lastName) {
         Random random = new Random();
