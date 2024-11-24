@@ -1,6 +1,7 @@
 package com.adbms.evaidhya.entity;
 
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -23,6 +24,7 @@ public class DoctorAvailability {
 
     @ManyToOne
     @JoinColumn(name="doctor_id",nullable = false)
+    @JsonBackReference
     private Doctor doctor;
 
     @Enumerated(EnumType.STRING)
