@@ -126,4 +126,8 @@ public class DoctorServiceImpl implements DoctorService {
         }
         doctorRepository.delete(doctor.get());
     }
+
+    public Doctor getDoctorByUserId(Long userId){
+        return doctorRepository.findByUserId(userId);
+    }
 }

@@ -8,6 +8,7 @@ import com.adbms.evaidhya.requestDTO.UpdatePasswordRequestDTO;
 import com.adbms.evaidhya.requestDTO.signUpRequestDTO;
 import com.adbms.evaidhya.responseDTO.MessageRes;
 import com.adbms.evaidhya.responseDTO.userResponseDTO;
+import com.adbms.evaidhya.service.DoctorService;
 import com.adbms.evaidhya.service.PatientService;
 import com.adbms.evaidhya.service.UserService;
 import com.adbms.evaidhya.service.jwt.UserDetailsImpl;
@@ -42,6 +43,9 @@ public class UserController {
 
     @Autowired
     private PatientService patientService;
+
+    @Autowired
+    private DoctorService doctorService;
 
     @Autowired
     private AuthenticationManager authenticationManager;
@@ -120,9 +124,11 @@ public class UserController {
             }
 
             if(user.getUserRole()== ROLE.DOCTOR) {
+                Long doctorId = doctorService.getDoctorByUserId(user.getId()).getId();
                 response.getWriter().write(new JSONObject()
                         .put("userId", user.getId())
                         .put("role", user.getUserRole())
+                        .put("doctorId",doctorId)
                         .toString()
                 );
             }
