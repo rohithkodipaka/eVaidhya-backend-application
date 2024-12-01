@@ -7,6 +7,8 @@ import com.adbms.evaidhya.requestDTO.PatientMedicalChartRequestDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+
 @Service
 public class PatientMedicalChartServiceImpl implements PatientMedicalChartService{
 
@@ -18,9 +20,9 @@ public class PatientMedicalChartServiceImpl implements PatientMedicalChartServic
             if(patientMedicalChart == null){
                 throw new Exception("No PatientMedicalChart found for given Patient Id");
             }
-            patientMedicalChart.setAllergies(patientMedicalChart.getAllergies()+" "+request.getAllergies());
-            patientMedicalChart.setDiagnosis(patientMedicalChart.getDiagnosis()+" "+request.getDiagnosis());
-            patientMedicalChart.setTreatment(patientMedicalChart.getTreatment()+" "+request.getTreatment());
+            patientMedicalChart.setAllergies((patientMedicalChart.getAllergies()==null?"": patientMedicalChart.getAllergies())+"\n"+ LocalDate.now()+" : " +request.getAllergies());
+            patientMedicalChart.setDiagnosis((patientMedicalChart.getDiagnosis()==null?"": patientMedicalChart.getDiagnosis())+"\n"+ LocalDate.now()+" : " +request.getDiagnosis());
+            patientMedicalChart.setTreatment((patientMedicalChart.getTreatment()==null?"": patientMedicalChart.getTreatment())+"\n"+ LocalDate.now()+" : " +request.getTreatment());
             return patientMedicalChartRepository.save(patientMedicalChart);
     }
 
