@@ -3,14 +3,16 @@ package com.adbms.evaidhya.controller;
 import com.adbms.evaidhya.enumerations.ROLE;
 import com.adbms.evaidhya.repository.UserRepository;
 import com.adbms.evaidhya.requestDTO.AuthRequest;
+import com.adbms.evaidhya.requestDTO.ChangePasswordRequestDTO;
+import com.adbms.evaidhya.requestDTO.UpdatePasswordRequestDTO;
 import com.adbms.evaidhya.requestDTO.signUpRequestDTO;
+import com.adbms.evaidhya.responseDTO.MessageRes;
 import com.adbms.evaidhya.responseDTO.userResponseDTO;
 import com.adbms.evaidhya.service.PatientService;
 import com.adbms.evaidhya.service.UserService;
 import com.adbms.evaidhya.service.jwt.UserDetailsImpl;
 import com.adbms.evaidhya.util.JwtUtil;
 import jakarta.servlet.http.HttpServletResponse;
-import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -19,13 +21,11 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import com.adbms.evaidhya.entity.User;
-
-import java.io.IOException;
 
 
 @RestController
@@ -59,6 +59,18 @@ public class UserController {
             return new ResponseEntity<>("User already exists with the email!", HttpStatus.NOT_ACCEPTABLE);
         userResponseDTO userResponse = userService.signUpPatient(request);
         return new ResponseEntity<>(userResponse,HttpStatus.CREATED);
+    }
+
+    @PostMapping("/api/user/changePassword")
+    public ResponseEntity<?> changePassword(@RequestBody ChangePasswordRequestDTO request){
+        MessageRes response = userService.changePassword(request);
+        return new ResponseEntity<>(response,HttpStatus.OK);
+    }
+
+    @PostMapping("/user/updatePassword")
+    public ResponseEntity<?> updatePassword(@RequestBody UpdatePasswordRequestDTO request){
+        MessageRes response = userService.updatePassword(request);
+        return new ResponseEntity<>(response,HttpStatus.OK);
     }
 
     @PostMapping("/doctor/signup")

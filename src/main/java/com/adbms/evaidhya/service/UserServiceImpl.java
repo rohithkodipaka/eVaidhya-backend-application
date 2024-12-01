@@ -8,9 +8,13 @@ import com.adbms.evaidhya.mapper.UserMapper;
 import com.adbms.evaidhya.repository.PatientMedicalChartRepository;
 import com.adbms.evaidhya.repository.PatientRepository;
 import com.adbms.evaidhya.repository.UserRepository;
+import com.adbms.evaidhya.requestDTO.ChangePasswordRequestDTO;
+import com.adbms.evaidhya.requestDTO.UpdatePasswordRequestDTO;
 import com.adbms.evaidhya.requestDTO.signUpRequestDTO;
+import com.adbms.evaidhya.responseDTO.MessageRes;
 import com.adbms.evaidhya.responseDTO.userResponseDTO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -27,6 +31,9 @@ public class UserServiceImpl implements UserService{
 
     @Autowired
     private PatientMedicalChartRepository patientMedicalChartRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     public userResponseDTO signUpPatient(signUpRequestDTO request){
          User user = userMapper.toUser(request);
@@ -63,4 +70,34 @@ public class UserServiceImpl implements UserService{
         user.setUserRole(ROLE.ADMIN);
         return userMapper.fromUser(userRepository.save(user));
     }
+
+    public MessageRes changePassword(ChangePasswordRequestDTO request){
+            MessageRes response = new MessageRes();
+            if(!emailExists(request.getUserId())){
+                response.setMessage("User Id doesn't exist");
+                return response;
+            }
+            User user = userRepository.findFirstByEmail(request.getUserId());
+            System.out.println(user.getEmail());
+            if(!passwordEncoder.matches(request.getOldPassword(),user.getPassword())){
+                response.setMessage("Old password does not match");
+                return response;
+            }
+            user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+            userRepository.save(user);
+            response.setMessage("Password updated successfully");
+            return response;
+    }
+
+    @Override
+    public MessageRes updatePassword(UpdatePasswordRequestDTO request) {
+        MessageRes response = new MessageRes();
+        User user = userRepository.findFirstByEmail(request.getEmail());
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        userRepository.save(user);
+        response.setMessage("Password updated successfully");
+        return response;
+    }
+
+
 }
