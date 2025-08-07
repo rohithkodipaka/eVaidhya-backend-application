@@ -22,10 +22,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import com.adbms.evaidhya.entity.User;
 
 
@@ -56,6 +53,11 @@ public class UserController {
     public static final String TOKEN_BEARER = "Bearer ";
 
     public static final String TOKEN_HEADER="Authorization";
+
+    @GetMapping("/")
+    public ResponseEntity<?> homePage(){
+        return new ResponseEntity<>("Welcome to Evaidya",HttpStatus.OK);
+    }
 
     @PostMapping("/patient/signup")
     public ResponseEntity<?> signUpPatient(@RequestBody signUpRequestDTO request){
