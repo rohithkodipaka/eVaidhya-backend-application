@@ -31,14 +31,14 @@ pipeline {
 
     stage('Build and Push Docker Image') {
       environment {
-        REGISTRY_CREDENTIALS = credentials('Docker Hub') // set this in Jenkins
+        REGISTRY_CREDENTIALS = credentials('Dockerhub') // set this in Jenkins
       }
       steps {
         dir("${APP_DIR}") {
           script {
             sh "docker build -t ${DOCKER_IMAGE} ."
             def dockerImage = docker.image("${DOCKER_IMAGE}")
-            docker.withRegistry('https://index.docker.io/v1/', 'Docker Hub') {
+            docker.withRegistry('https://index.docker.io/v1/', 'Dockerhub') {
               dockerImage.push()
             }
           }
