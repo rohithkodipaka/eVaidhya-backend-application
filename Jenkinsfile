@@ -7,9 +7,9 @@ pipeline {
   }
 
   environment {
-    APP_DIR = "."  // Your app is at the root of the repo
-    IMAGE_NAME = "rohithkodipaka/evaidhya-backend"
-    DOCKER_IMAGE = "${IMAGE_NAME}:${BUILD_NUMBER}"
+    APP_DIR = "."  // Project root
+    IMAGE_NAME = "rohithk29/evaidya"
+    DOCKER_IMAGE = "${IMAGE_NAME}:latest"
     GIT_REPO_NAME = "eVaidhya-backend-application"
     GIT_USER_NAME = "rohithkodipaka"
   }
@@ -31,15 +31,22 @@ pipeline {
 
     stage('Build and Push Docker Image') {
       environment {
-        REGISTRY_CREDENTIALS = credentials('Dockerhub') // set this in Jenkins
+        REGISTRY_CREDENTIALS = credentials('Dockerhub') // Set this ID in Jenkins Credentials
       }
       steps {
         dir("${APP_DIR}") {
           script {
+            // Ensure Docker is working
+            sh 'docker info'
+
+            // Build the Docker image
             sh "docker build -t ${DOCKER_IMAGE} ."
-            def dockerImage = docker.image("${DOCKER_IMAGE}")
-            docker.withRegistry('https://index.docker.io/v1/', 'Dockerhub') {
-              dockerImage.push()
+
+            // Login using credentials and push manually (avoids Jenkins docker context issues)
+            withCredentials([usernamePassword(credentialsId: 'Dockerhub', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+              sh 'echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin'
+              sh "docker push ${DOCKER_IMAGE}"
+              sh 'docker logout'
             }
           }
         }
